@@ -11,9 +11,7 @@
 #define LED_VD 10
 #define LED_VM 11
 #define CHAVE  12
-//DHT DHT11; // declara um objeto do tipo DHT chamado DHT11
-
-
+DHT DHT(DHT_PIN,DHT11); // declara um objeto do tipo DHT chamado DHT11
 
 enum
 {
@@ -37,7 +35,7 @@ void setup() {
   pinMode(LED_AZ,OUTPUT);
   pinMode(LED_VD,OUTPUT);
   pinMode(LED_VM,OUTPUT);
-  //Serial.begin(9600);
+  DHT.begin();
   modbus_configure(&Serial, 9600, SERIAL_8N1, 1, 2, HOLDING_REGS_SIZE,holdingRegs);
   modbus_update_comms(9600, SERIAL_8N1, 1);
 
@@ -52,9 +50,9 @@ void loop() {
   holdingRegs[VALOR_POT2] = analogRead(A1);
   holdingRegs[VALOR_POT3] = analogRead(A2);
   holdingRegs[MAN_AUTO] = digitalRead(CHAVE);
-  //DHT11.read11(DHT_PIN); 
-  //holdingRegs[VALORT_DHT11]=DHT11.temperature;
-  //holdingRegs[VALORH_DHT11]=DHT11.humidity;
+  DHT.read(DHT_PIN); 
+  holdingRegs[VALORT_DHT11]=DHT.readTemperature();
+  holdingRegs[VALORH_DHT11]=DHT.readHumidity();
 
   /* Mapeia os valores analógicos (de 0 a 1023) para valores digitais (De 0 a 255) para escrever nas saídas depois */
   valor1=map(holdingRegs[VALOR_POT1],0,1023,0,255);
@@ -86,11 +84,6 @@ if (holdingRegs[MAN_AUTO] == 0) {
     analogWrite (LED_AZ, holdingRegs [VALOR_PWMB]);    
  
   }
-  /*
-  // é por causa disso aqui que o codigo ta sempre com algum valor aceso
-  analogWrite(LED_AZ,valor1);
-  analogWrite(LED_VD,valor2);
-  analogWrite(LED_VM,valor3);
-*/
+  
 
 }
